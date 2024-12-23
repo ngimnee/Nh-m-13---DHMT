@@ -1,4 +1,4 @@
-﻿/*===== NO FULL =====*/
+﻿/*========== FULL ==========*/
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -12,18 +12,17 @@
 
 using namespace std;
 
-//thêm tam giác màu
+//Thêm tam giác màu
 static const float coloredTriangle[] = {
 	//position			//colors
-	 1.0, -1.0,  0.0,	1.0, 0.0, 0.0,//bottom right
-	-1.0, -1.0,  0.0,	0.0, 1.0, 0.0,//bottom left
-	 0.0,  1.0,  0.0,	0.0, 0.0, 1.0//top
+	 1.0, -1.0,  0.0,	1.0, 0.0, 0.0,  //bottom right
+	-1.0, -1.0,  0.0,	0.0, 1.0, 0.0,  //bottom left
+	 0.0,  1.0,  0.0,	0.0, 0.0, 1.0   //top
 };
 
 typedef struct
 {
 	float xyzw[4];
-
 	float normal[4];
 } Vertex;
 
@@ -89,7 +88,7 @@ const size_t VertexSize = sizeof(Vertices[0]);
 const size_t NormalOffset = sizeof(Vertices[0].xyzw);
 
 
-// định nghĩa stack cho ma trận
+//Định nghĩa stack cho ma trận
 class MatrixStack {
 	int    index;
 	int    size;
@@ -143,40 +142,41 @@ model_mat_location,
 view_mat_location,
 projection_mat_location;
 
-// Dùng biến đổi mô hình
+//Dùng biến đổi mô hình
 float
 r[] = { 0.0f, 0.0f, 0.0f },
 s[] = { 1.0f, 1.0f, 1.0f },
 t[] = { 0.0f, 0.0f, 0.0f };
-//=============sử dụng cho camera============
+
+//Sử dụng cho camera
 int midWindowX;
 int midWindowY;
 
 
 bool keys[256]; // Array to keep track of pressed keys
 bool mouseLocked = true;
-float yaw = 0.0f;
+float yaw = 90.0f;
 float pitch = 0.0f;
 
-float cameraX = 0.0f;
+float cameraX = -7.0f;
 float cameraY = 0.0f;
-float cameraZ = 5.0f;
+float cameraZ = -2.0f;
 float moveSpeed = 0.5f;
 float jumpSpeed = 0.2f;
 float gravity = 0.010f;
 bool isJumping = false;
 bool isGrounded = true;
 
-// ======Dùng kiểm tra tịnh tiến, quay, co giãn====
+//Dùng kiểm tra tịnh tiến, quay, co giãn
 bool
 translated = false,
 rotated = false,
 scaled = false;
 
-//---------------------------------------------Khai báo các biến sử dụng để vẽ------------------------------------------
+//===================== Khai báo các biến sử dụng để vẽ =========================//
 float Alpha = 0.0f;
-//thiết lập chỉ mục cho menu
 
+//Thiết lập chỉ mục cho menu
 enum {
 	windown1,
 	windownJoint_z
@@ -219,8 +219,8 @@ GLfloat angle_canhtu[canhtuJoint] = {
 };
 GLint angle_tu_y = tu1;
 
-//--------------------------------------------------kết thúc khai báo các biến vẽ
-// ------------------------------------------
+//==================== Kết thúc khai báo các biến vẽ =========================//
+// ------------------------------------------//
 string ReadShaderSourceFile(string fileName) {
 	fstream reader(fileName.c_str());
 	string line;
@@ -231,7 +231,8 @@ string ReadShaderSourceFile(string fileName) {
 	reader.close();
 	return code;
 }
-// ------------------------------------------
+
+//-------------------------------------------//
 void CreatVaoVbo()
 {
 	// Tạo và liên kết VAO và VBO cho tam giác có màu
@@ -272,7 +273,7 @@ void CreatVaoVbo()
 	glEnable(GL_DEPTH_TEST);
 	glutSetCursor(GLUT_CURSOR_NONE);
 }
-// ------------------------------------------
+//---------------------------------------------//
 void CreatShaders()
 {
 	string vertexSrc = ReadShaderSourceFile("./vs.shader");
@@ -295,7 +296,7 @@ void CreatShaders()
 	glLinkProgram(ProgramId);
 	glUseProgram(ProgramId);
 }
-// ------------------------------------------
+//--------------------------------------------//
 void CloseFunc()
 {
 	glUseProgram(0);
@@ -318,8 +319,8 @@ void CloseFunc()
 	glBindVertexArray(0);
 	glDeleteVertexArrays(1, &VaoId[0]);
 }
-//--------------------------------------------
-//-------------------------ánh sáng----------------------------------
+//--------------------------------------------------------//
+//---------------------- Ánh sáng -----------------------//
 #pragma region light
 bool light1 = true, light2 = true;
 
@@ -349,12 +350,12 @@ void offl2() {
 	updateLightUniforms();
 }
 #pragma endregion
-// ==========================================================Tạo các đối tượng==========================================
-// --------------Hàm gọi màu trong vs.shader----------------------------
+//===================================================== Tạo các đối tượng =========================================//
+//-------------- Hàm gọi màu trong vs.shader ----------------------//
 void setInt(const string& name, int value) {
 	glUniform1i(glGetUniformLocation(ProgramId, name.c_str()), value);
 }
-//-----------Tạo khối hộp cube đơn vị--------
+//----------- Tạo khối hộp cube đơn vị ---------//
 void cube()
 {
 	mvstack.push(model_mat_cpp);
@@ -365,7 +366,7 @@ void cube()
 	model_mat_cpp = mvstack.pop();
 }
 
-//--------------ve phong lam viec------------
+//-------------ve phong lam viec-----------
 #pragma region room and door
 void room()
 {
@@ -394,14 +395,14 @@ void room()
 	model_mat_cpp = mvstack.pop();
 
 	// mặt trước
-	 //mảnh tường to thứ nhất
+	//mảnh tường to thứ nhất
 	mvstack.push(model_mat_cpp);
 	setInt("color", 15);
 	model_mat_cpp = model_mat_cpp * translate(vec3(-2.5, 1.65, -3.5)) * scale(vec3(0.01, 2.5, 7.0));
 	cube();
 	model_mat_cpp = mvstack.pop();
 
-	////mảnh tường nhỏ bên trái
+	//mảnh tường nhỏ bên trái
 	mvstack.push(model_mat_cpp);
 	setInt("color", 15);
 	model_mat_cpp = model_mat_cpp * translate(vec3(-2.5, -0.35, -0.5)) * scale(vec3(0.01, 1.5, 1));
@@ -450,13 +451,14 @@ void room()
 	cube();
 	model_mat_cpp = mvstack.pop();
 }
-// cửa
+
+//------------cửa chính--------------
 float door_angle = 0.0f;
 void door() {
 	mvstack.push(model_mat_cpp);
 	// Xoay cánh cửa
 	mvstack.push(model_mat_cpp);
-	setInt("color", 1);
+	setInt("color", 18);
 	model_mat_cpp = model_mat_cpp
 		* translate(vec3(-2.5, -0.35, -1.5)) // Đặt cửa gần khung trái
 		* translate(vec3(-0.025, 0.0, 0.5))   // Đưa về điểm xoay (bản lề)
@@ -503,7 +505,7 @@ void door() {
 }
 #pragma endregion
 
-//-----ve window------
+//---------ve window-------
 #pragma region window
 void windown(float tmp) {
 	//khung tren
@@ -565,9 +567,9 @@ void windowns(float tx, float ty, float tz, float sx, float sy, float sz, float 
 }
 #pragma endregion
 
-//-------ve camera-------------
+//-----------------ve camera-------------
 #pragma region camera
-bool switch_camera = false;
+bool switch_camera = true;
 float camera_angle = 0.0f;
 float camera_direction = 1.0f;
 void camera() {
@@ -612,7 +614,7 @@ void light() {
 	model_mat_cpp = mvstack.pop();
 	//tai phai
 	mvstack.push(model_mat_cpp);
-	model_mat_cpp = model_mat_cpp * translate(vec3(1.35, 3, 0.95)) * scale(vec3(0.1, 0.1, 0.07));
+	model_mat_cpp = model_mat_cpp * translate(vec3(1.35, 3,- 0.95)) * scale(vec3(0.1, 0.1, 0.07));
 	setInt("color", 1);
 	cube();
 	model_mat_cpp = mvstack.pop();
@@ -633,63 +635,72 @@ void lights(float tx, float ty, float tz, float sx, float sy, float sz, int tmp)
 }
 #pragma endregion
 
-//------ve ghe----------
+//--------------ve ghe lam viec------------
 #pragma region chair
 void chair() {
 	mvstack.push(model_mat_cpp);
+
 	//mat ghe
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(0.0, 0.0, 0.08)) * scale(vec3(0.6, 0.05, 0.77));
 	setInt("color", 1);
 	cube();
 	model_mat_cpp = mvstack.pop();
-	//chong tua trai
-	mvstack.push(model_mat_cpp);
-	model_mat_cpp = model_mat_cpp * translate(vec3(-0.275, 0.325, -0.275)) * scale(vec3(0.05, 0.6, 0.05));
-	setInt("color", 2);
-	cube();
-	model_mat_cpp = mvstack.pop();
-	//chong tua phai
-	mvstack.push(model_mat_cpp);
-	model_mat_cpp = model_mat_cpp * translate(vec3(0.275, 0.325, -0.275)) * scale(vec3(0.05, 0.6, 0.05));
-	setInt("color", 2);
-	cube();
-	model_mat_cpp = mvstack.pop();
-	//tua
+
+	//tua lung
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(0.0, 0.3, -0.275)) * scale(vec3(0.5, 0.6, 0.02));
 	setInt("color", 1);
 	cube();
 	model_mat_cpp = mvstack.pop();
+
+	//tay vin trai
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(-0.275, 0.325, -0.275)) * scale(vec3(0.05, 0.6, 0.05));
+	setInt("color", 2);
+	cube();
+	model_mat_cpp = mvstack.pop();
+
+	//tay vin phai
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(0.275, 0.325, -0.275)) * scale(vec3(0.05, 0.6, 0.05));
+	setInt("color", 2);
+	cube();
+	model_mat_cpp = mvstack.pop();
+
 	//chan phai tren
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(0.275, -0.325, 0.375)) * scale(vec3(0.05, 0.6, 0.05));
 	setInt("color", 2);
 	cube();
 	model_mat_cpp = mvstack.pop();
+
 	//chan trai tren
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(-0.275, -0.325, 0.375)) * scale(vec3(0.05, 0.6, 0.05));
 	setInt("color", 2);
 	cube();
 	model_mat_cpp = mvstack.pop();
+
 	//chan phai duoi
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(0.275, -0.325, -0.275)) * scale(vec3(0.05, 0.6, 0.05));
 	setInt("color", 2);
 	cube();
 	model_mat_cpp = mvstack.pop();
+
 	//chan trai duoi
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(-0.275, -0.325, -0.275)) * scale(vec3(0.05, 0.6, 0.05));
 	setInt("color", 2);
 	cube();
 	model_mat_cpp = mvstack.pop();
+
 	model_mat_cpp = mvstack.pop();
 }
 #pragma endregion
 
-//------------------
+//---------------------------------------//
 void chairs(float tx, float ty, float tz, float sx, float sy, float sz, int j) {
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(work_chairx, 0.0, work_chairz)) * translate(vec3(tx, ty, tz)) * scale(vec3(sx, sy, sz)) * rotate_y(360 / j);
@@ -697,7 +708,7 @@ void chairs(float tx, float ty, float tz, float sx, float sy, float sz, int j) {
 	model_mat_cpp = mvstack.pop();
 }
 
-//----------ve ban----------
+//--------------ve ban-------------
 #pragma region Ve cai ban
 
 #define chieucaoban 0.7
@@ -842,9 +853,92 @@ void veban(float tx, float ty, float tz, float sx, float sy, float sz, GLfloat n
 	model_mat_cpp = mvstack.pop();
 
 	model_mat_cpp = mvstack.pop();
+
+}
+#pragma endregion
+
+//-----------ve ban sofa--------------
+#pragma region Ve cai bansofa
+namespace bansofa {
+	void matbansofa() {
+		mvstack.push(model_mat_cpp);
+		setInt("color", 2);
+		mat4 instance = identity_mat4();
+		instance = translate(vec3(0.0, 0.5, 0.6/ 2.0)) *
+			scale(vec3(1, 0.05, 0.6));
+
+		mat4 model_torso = model_mat_cpp * instance;
+
+		glUniformMatrix4fv(model_mat_location, 1, GL_FALSE, model_torso.m);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		model_mat_cpp = mvstack.pop();
+	}
+	void chanbansofa()
+	{
+		mvstack.push(model_mat_cpp);
+		setInt("color", 10);
+		mat4 instance = identity_mat4();
+		instance = translate(vec3(0, 0.5 / 2.0, 0)) * scale(vec3(0.17, 0.5, 0.4));
+
+		mat4 model_left_upper_arm = model_mat_cpp * instance;
+
+		glUniformMatrix4fv(model_mat_location, 1, GL_FALSE, model_left_upper_arm.m);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		model_mat_cpp = mvstack.pop();
+	}
+	void vebansofa() {
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(0, -1, 0));
+		bansofa::matbansofa();
+
+		// Chan ban 1
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(-1 / 2.0 + 0.17, 0, 0.3));
+		bansofa::chanbansofa();
+		model_mat_cpp = mvstack.pop();
+
+		// Chan ban 2
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(1 / 2.0 - 0.17, 0, 0.3));
+		bansofa::chanbansofa();
+		model_mat_cpp = mvstack.pop();
+		
+
+		/*
+		// chan ban 2
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(-1 / 2.0 + 0.2, 0, 0.6 - 0.2));
+		bansofa::chanbansofa();
+		model_mat_cpp = mvstack.pop();
+
+
+		// Chan ban 3
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(1 / 2.0 - 0.2, 0, 0.2));
+		bansofa::chanbansofa();
+		model_mat_cpp = mvstack.pop();
+
+		// chan ban 4
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(1 / 2.0 - 0.2, 0, 0.6 - 0.2));
+		bansofa::chanbansofa();
+		model_mat_cpp = mvstack.pop();
+		*/
+
+		model_mat_cpp = mvstack.pop();
+		 
+	}
+}
+void vebansofa(float tx, float ty, float tz, float sx, float sy, float sz,int j) {
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(tx, ty, tz)) * scale(vec3(sx, sy, sz)) * rotate_y(-180 / j);
+		bansofa::vebansofa();
+		model_mat_cpp = mvstack.pop();
 }
 
-//---------ve dong ho-----------
+//--------------ve dong ho--------------
 #pragma region clock
 float hour_angle = 0.0f;
 float min_angle = 15.0f;
@@ -962,7 +1056,7 @@ namespace dongho {
 }
 #pragma endregion
 
-//--------ve tu------------
+//-------------ve tu----------------
 #pragma region Ve cai tu
 
 #define chieucaotu 1.2
@@ -1053,7 +1147,7 @@ namespace tu {
 		model_mat_cpp = mvstack.pop();
 	}*/
 }
-void draw_cabinet(float tx, float ty, float tz, float sx, float sy, float sz, GLfloat angle_canh1)
+void draw_tu(float tx, float ty, float tz, float sx, float sy, float sz, GLfloat angle_canh1)
 {
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(tx, ty, tz)) * scale(vec3(sx, sy, sz));
@@ -1074,8 +1168,243 @@ void draw_cabinet(float tx, float ty, float tz, float sx, float sy, float sz, GL
 }
 #pragma endregion
 
-//==============================================================Hết tạo các đối tượng==============================
-//-------------------------------
+//--------------ve quat tran----------------
+#pragma region draw ceiling fan
+//CEILING FAN quạt trần: chiều cao quạt là 2, độ dài bề ngang là 5 (đã làm tròn) tâm tại (0,0,0) là tâm của base_đỉnh của quạt
+bool switch_fan = false;
+namespace fan {
+	void fan_blade_x()
+	{
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(0, 0, 0))
+			* scale(vec3(2.0f, 0.1f, 0.6f)) * rotate_x(30);
+		setInt("color", 16);
+		cube();
+		model_mat_cpp = mvstack.pop();
+	}
+	void fan_blade_z()
+	{
+		mvstack.push(model_mat_cpp);
+		setInt("color", 16);
+		model_mat_cpp = model_mat_cpp * translate(vec3(0, 0, 0))
+			* scale(vec3(0.6f, 0.1f, 2.0f)) * rotate_z(30);
+		cube();
+
+		model_mat_cpp = mvstack.pop();
+	}
+	void fan_base()
+	{
+		mvstack.push(model_mat_cpp);
+		setInt("color", 16);
+		model_mat_cpp = model_mat_cpp * translate(vec3(0, 0, 0))
+			* scale(vec3(0.8f, 0.2f, 0.8f));
+		cube();
+		model_mat_cpp = mvstack.pop();
+	}
+	void ceiling_fan()
+	{
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * scale(vec3(0.3, 0.3, 0.3));
+		//base dequat
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(0, -0.1, 0));
+		fan::fan_base();
+		model_mat_cpp = mvstack.pop();
+		//Downrod tru quat
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(0, -0.9, 0))
+			* scale(vec3(0.2f, 1.4f, 0.2f));
+		setInt("color", 6);
+		cube();
+		model_mat_cpp = mvstack.pop();
+		//Motor Housing bau quat
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * translate(vec3(0, -1.7, 0));
+		fan::fan_base();
+		model_mat_cpp = mvstack.pop();
+		//fan blade 1
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * rotate_y(Alpha)
+			* translate(vec3(1.4, -1.7, 0));
+		fan::fan_blade_x();
+		model_mat_cpp = mvstack.pop();
+		//fan blade 2
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * rotate_y(Alpha)
+			* translate(vec3(-1.4, -1.7, 0));
+		fan::fan_blade_x();
+		model_mat_cpp = mvstack.pop();
+		//fan blade 3
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * rotate_y(Alpha)
+			* translate(vec3(0, -1.7, 1.4));
+		fan::fan_blade_z();
+		model_mat_cpp = mvstack.pop();
+		//fan blade 4
+		mvstack.push(model_mat_cpp);
+		model_mat_cpp = model_mat_cpp * rotate_y(Alpha)
+			* translate(vec3(0, -1.7, -1.4));
+		fan::fan_blade_z();
+		model_mat_cpp = mvstack.pop();
+		model_mat_cpp = mvstack.pop();
+	}
+}
+void quat(float qx, float qy, float qz) {
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(qx, qy, qz));
+	fan::ceiling_fan();
+	model_mat_cpp = mvstack.pop();
+}
+#pragma endregion
+
+//---------------ve sofa---------------
+GLfloat ghe_sofax = 0.0;
+GLfloat ghe_sofaz = 0.0;
+#pragma endregion
+void drawSofa() {
+	mvstack.push(model_mat_cpp);
+
+	//ngồi
+	setInt("color", 20);
+	model_mat_cpp = model_mat_cpp * translate(vec3(0, 0.1, 0)) * scale(vec3(1.5, 0.2, 0.7)); // Adjust size
+	cube(); // Draw the seat
+	model_mat_cpp = mvstack.pop();
+
+	// đệm ngồi
+	mvstack.push(model_mat_cpp);
+	setInt("color", 19); // Set color for the seat
+	model_mat_cpp = model_mat_cpp * translate(vec3(0, 0.25, 0.05)) * scale(vec3(1.3, 0.1, 0.6)); // Adjust size
+	cube(); // Draw the seat
+	model_mat_cpp = mvstack.pop();
+
+	// tựa lưng
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(0, 0.4, -0.3)) * scale(vec3(1.5, 0.72, 0.1)); // Adjust size and position
+	setInt("color", 20); // Set color for the backrest
+	cube(); // Draw the backrest
+	model_mat_cpp = mvstack.pop();
+
+	// vịn trái
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(-0.7, 0.35, 0)) * scale(vec3(0.1, 0.35, 0.7)); // Adjust size and position
+	setInt("color", 20); // Set color for the left armrest
+	cube(); // Draw the left armrest
+	model_mat_cpp = mvstack.pop();
+
+	// vịn phải
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(0.7, 0.35, 0)) * scale(vec3(0.1, 0.35, 0.7)); // Adjust size and position
+	setInt("color", 20); // Set color for the right armrest
+	cube(); // Draw the right armrest
+	model_mat_cpp = mvstack.pop();
+}
+void sofa(float tx, float ty, float tz, float sx, float sy, float sz, int j) {
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(ghe_sofax, -0.1, ghe_sofaz)) * translate(vec3(tx, ty, tz)) * scale(vec3(sx, sy, sz)) * rotate_y(-180 / j);
+	drawSofa();
+	model_mat_cpp = mvstack.pop();
+}
+
+//--------ve dieu hoa---------
+#pragma region air conditioner
+//conditioner size= (2,3,8.4) 
+bool _switch_con = false;
+float angle_conditioner = 0.0f;
+float angle_conditioners = 1.0f;
+void conditioner()
+{
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * scale(vec3(0.2, 0.2, 0.2));//giam size di 1/4 
+	//hộp to
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(11, -0.5, -9)) * scale(vec3(8.4, 2.3, 2));
+	setInt("color", 98);
+	cube();
+	model_mat_cpp = mvstack.pop();
+	//hộp nhỏ
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(11, -1.8, -9)) * scale(vec3(8.4, 0.5, 1.6));
+	setInt("color", 98);
+	cube();
+	model_mat_cpp = mvstack.pop();
+	//hộp dưới
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(11, -2, -9)) * scale(vec3(8.4, 0.1, 2));
+	setInt("color", 98);
+	cube();
+	model_mat_cpp = mvstack.pop();
+	//canh ben trai
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(6.8, -0.67, -9)) * scale(vec3(0.01, 2.7, 2));
+	setInt("color", 2);
+	cube();
+	model_mat_cpp = mvstack.pop();
+	//canh ben phai
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(15.2, -0.67, -9)) * scale(vec3(0.01, 2.7, 2));
+	setInt("color", 2);
+	cube();
+	model_mat_cpp = mvstack.pop();
+	//cua
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp
+		* translate(vec3(11, -1.82, -8.0))
+		* translate(vec3(0.0, -0.25, 0.0))
+		* rotate_x(angle_conditioner)
+		* translate(vec3(0.0, 0.25, 0.0))
+		* scale(vec3(8.4, 0.4, 0.01));
+	mvstack.push(model_mat_cpp);
+	setInt("color", 2);
+	cube();
+	model_mat_cpp = mvstack.pop();
+	model_mat_cpp = mvstack.pop();
+	model_mat_cpp = mvstack.pop();
+}
+void dieuhoa(float qx, float qy, float qz) {
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(qx, qy, qz));
+	conditioner();
+	model_mat_cpp = mvstack.pop();
+}
+#pragma endregion
+
+//ve laptop
+#pragma region laptop
+bool switch_lap = false;
+float lap_angle = 0.0f;
+void laptop() {
+	mvstack.push(model_mat_cpp);
+	//ban phim
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(0.2, 0.6, 0.4)) * scale(vec3(0.12, 0.02, 0.27));
+	setInt("color", 10);
+	cube();
+	model_mat_cpp = mvstack.pop();
+
+	//man hinh
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp
+		* translate(vec3(0.2, 0.62, 0.4))   // Vị trí trung tâm giữa các khung
+		* translate(vec3(-0.06, 0.0, 0.0))
+		* rotate_z(lap_angle)
+		* translate(vec3(0.06, 0.0, 0.0))
+		* scale(vec3(0.12, 0.01, 0.27));
+	setInt("color", 10);
+	cube();
+	model_mat_cpp = mvstack.pop();
+	model_mat_cpp = mvstack.pop();
+}
+void laptops(float tx, float ty, float tz, float sx, float sy, float sz) {
+
+	mvstack.push(model_mat_cpp);
+	model_mat_cpp = model_mat_cpp * translate(vec3(tx, ty, tz)) * scale(vec3(sx, sy, sz));
+	laptop();
+	model_mat_cpp = mvstack.pop();
+}
+#pragma endregion
+
+//============================================ Hết tạo các đối tượng ================================//
+//-----------------------------------//
 void DisplayFunc(void)
 {
 	model_mat_cpp = identity_mat4();
@@ -1100,9 +1429,11 @@ void DisplayFunc(void)
 	}
 
 	glMatrixMode(GL_MODELVIEW);
+
+
 	// Các tham số của hàm lookat
 	vec3	eye(cameraX, cameraY, cameraZ),
-		at(cameraX + sin(yaw ), cameraY - pitch, cameraZ - cos(yaw)),
+		at(cameraX + sin(yaw), cameraY - pitch, cameraZ - cos(yaw) - 0.3f),
 		up(0.0f, 1.0f, 0.0f);
 
 	view_mat_cpp = lookat(eye, at, up);
@@ -1123,6 +1454,8 @@ void DisplayFunc(void)
 
 	glClearColor(1.0, 1.0, 1.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 	//-----------------draw------------------
 	room();
 	door();
@@ -1130,19 +1463,29 @@ void DisplayFunc(void)
 
 	lights(13.5, 1.15, -2.6, 4.5, 1.2, 1.9, 1);
 	windowns(-2.5, 0.975, -5.5, 0.95, 1.6, 1.65, windown_rotate[windown1], 1);
+
+
+	vebansofa(0.5, 0.1, -1.3, 1.6, 1.2, 1.5, 2);
+	sofa(2.0, -1.0, -1.45, 1.2, 1.2, 1.9, 2.0);		//sofa dài
+	sofa(0.6, -1.0, -2.7, 0.6, 1.0, 1.1, -180);		//sofa ngắn
+	//sofa(0.6f, -1.0f, -0.5f, 1.0f, 1.0f, 1.0f, -1);
+	quat(0.5, 2.9, -3.5);
+
+	dieuhoa(-2.3, 2.55, -5);
+	laptops(0.1, -0.55, -5.1, 1.5, 0.5, 1);
 	
 	//camera
 	cameras(2.2, 2.8, -6.95, 1.0, 1.0, 1.0);
 
-	//ban
+	//ban lam viec
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(work_tablex[table0], 0.1f, -5.5f)) * rotate_y(90);
 	veban(-0.5, 0, 0, 1.6, 1.2, 1.2, ngankeo_z[ngankeo]);
 	model_mat_cpp = mvstack.pop();
 
-	//ghe
+	//ghe lam viec
 	mvstack.push(model_mat_cpp);
-	model_mat_cpp = model_mat_cpp * translate(vec3(1.2f, -0.5f, -6.1f)) * rotate_y(-90);
+	model_mat_cpp = model_mat_cpp * translate(vec3(1.2f, -0.5f, -6.2f)) * rotate_y(-90);
 	chairs(1.5f, 0.0f, 0.2f, 0.9, 0.8, 0.4, 1);
 	model_mat_cpp = mvstack.pop();
 
@@ -1151,23 +1494,23 @@ void DisplayFunc(void)
 	model_mat_cpp = model_mat_cpp * translate(vec3()) * scale(vec3(0.4, 0.4, 0.4)) * rotate_y(180);
 	dongho::vedongho(0, 4.5, 0.2, 1, 1, 1);
 	model_mat_cpp = mvstack.pop();
-
+	
 	//tu 
 	//tu 1
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(2.25, -chieucaotu + 0.005, -5.5)) * rotate_y(90);
-	draw_cabinet(0, 0.1, 0, 1.5, 1.5, 0.8, angle_canhtu[tu1]);
+	draw_tu(0, 0.1, 0, 1.5, 1.5, 0.8, angle_canhtu[tu1]);
 	model_mat_cpp = mvstack.pop();
 	//tu 2
 	mvstack.push(model_mat_cpp);
 	model_mat_cpp = model_mat_cpp * translate(vec3(2.25, -chieucaotu + 0.005, -5.5)) * rotate_y(90);
-	draw_cabinet(-1.0, 0.1, 0, 1.0, 1.35, 0.8, angle_canhtu[tu2]);
+	draw_tu(-1.0, 0.1, 0, 1.0, 1.35, 0.8, angle_canhtu[tu2]);
 	model_mat_cpp = mvstack.pop();
 
 
 	glutSwapBuffers();
 }
-//---các hàm cho cam-----------
+//--------------Các hàm cho cam--------------//
 void handleMouseMove(int x, int y) {
 	if (mouseLocked) {
 		int deltaX = x - midWindowX;
@@ -1200,7 +1543,7 @@ void updateCamera() {
 	}
 	glutPostRedisplay();
 }
-// ------------------------------------------
+// ------------------------------------------//
 void ReshapeFunc(int Width, int Height)
 {
 	CurrentWidth = Width;
@@ -1209,12 +1552,12 @@ void ReshapeFunc(int Width, int Height)
 	midWindowY = Height / 2;//
 	glViewport(0, 0, CurrentWidth, CurrentHeight);
 }
-// ------------------------------------------
+// ------------------------------------------//
 bool phim1 = true, phim2 = true;
 void IdleFunc(void)
 {
 	updateCamera();
-	//------light-----on---off----
+	//------light-----on/off
 	if (phim1) {
 		onl1(); glutPostRedisplay();
 	}
@@ -1229,6 +1572,28 @@ void IdleFunc(void)
 		glutPostRedisplay();
 	}
 
+	//fan
+	if (switch_fan) {
+		Alpha += 5.0f;
+		if (Alpha > 360.0f) {
+			Alpha -= 360.0f;
+		}
+		glutPostRedisplay();
+	}
+	else {
+		glutPostRedisplay();
+	}
+
+	//conditioner
+	if (_switch_con) {
+		angle_conditioner += angle_conditioners * 0.02f;
+		if (angle_conditioner <= -0.5f || angle_conditioner >= 95.0f) {
+			angle_conditioners = -angle_conditioners;
+		}
+		glutPostRedisplay();
+	}
+
+
 	// camera
 	if (switch_camera) {
 		camera_angle += camera_direction * 0.1f;  // Cap nhat goc quayy
@@ -1238,7 +1603,7 @@ void IdleFunc(void)
 	glutPostRedisplay();
 	}
 
-	//dong ho
+	// dong ho
 	hour_angle += 0.005; // Tăng góc lên mỗi lần gọi hàm
 	if (hour_angle >= 360) {
 		hour_angle = 0; // Nếu góc lớn hơn hoặc bằng 360 độ, đặt lại về 0 độ
@@ -1257,18 +1622,22 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		glutLeaveMainLoop();
 		break;
 		//----camera------------
+	case 'W':
 	case 'w':
 		cameraX += sin(yaw) * moveSpeed;
 		cameraZ -= cos(yaw) * moveSpeed;
 		break;
+	case 'S':
 	case 's':
 		cameraX -= sin(yaw) * moveSpeed;
 		cameraZ += cos(yaw) * moveSpeed;
 		break;
+	case 'D':
 	case 'd':
 		cameraX += sin(yaw - 3.1415926535 / 2) * moveSpeed;
 		cameraZ -= cos(yaw - 3.1415926535 / 2) * moveSpeed;
 		break;
+	case 'A':
 	case 'a':
 		cameraX += sin(yaw + 3.1415926535 / 2) * moveSpeed;
 		cameraZ -= cos(yaw + 3.1415926535 / 2) * moveSpeed;
@@ -1280,7 +1649,8 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		}
 		keys[key] = true;
 		break;
-		//-----light---
+
+	//-----light---
 	case 'C':
 	case 'c'://on/off light1
 		if (phim1) phim1 = false;
@@ -1291,7 +1661,8 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		if (phim2) phim2 = false;
 		else phim2 = true;
 		break;
-		//-----light---
+
+	//-----light---
 	case 'x':
 		r[0] -= 10.0f;
 		rotated = true;
@@ -1360,24 +1731,27 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		translated = true;
 		break;
 
+	//cửa
 	case '/'://mở cửa
 		door_angle += 2.0f;
-		if (door_angle >= 170) door_angle = 170.0f;
+		if (door_angle >= 150) door_angle = 150.0f;
 		break;
 	case '?'://đóng cửa
 		door_angle -= 2.0f;
 		if (door_angle <= 0) door_angle = 0;
 		break;
 
-	case '6'://window
+	//windows
+	case '6':
 		windown_rotate[rotate_windown] += 1.5;
 		if (windown_rotate[rotate_windown] >= 90.0) { windown_rotate[rotate_windown] = 90.0; }
 		break;
-	case '7'://window
+	case '7':
 		windown_rotate[rotate_windown] -= 1.5;
 		if (windown_rotate[rotate_windown] <= 0.0) { windown_rotate[rotate_windown] = 0.0; }
 		break;
-		// camera
+
+	// camera
 	case '2':
 		if (switch_camera) {
 			switch_camera = false;
@@ -1387,19 +1761,20 @@ void KeyboardFunc(unsigned char key, int x, int y)
 			switch_camera = true;
 			break;
 		}
-	// ghế
+
+	// ghế làm việc
 	case 'f':
-		if (work_chairx <= 1.6) {
+		if (work_chairx <= 1.3) {
 			work_chairx += 0.1;
 		}
 		break;
 	case 'r':
-		if (work_chairx >= -2.0) {
+		if (work_chairx >= -1.75) {
 			work_chairx -= 0.1;
 		}
 		break;
 	case 'u':
-		if (work_chairz <= 0.7) {
+		if (work_chairz <= 2.5) {
 			work_chairz += 0.1;
 		}
 		break;
@@ -1409,13 +1784,62 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		}
 		break;
 
-	case 'm':
+	//tủ tài liệu
+	case 't':
 		angle_canhtu[angle_tu_y] -= 2.0f;
 		if (angle_canhtu[angle_tu_y] <= -90) angle_canhtu[angle_tu_y] = -90;
 		break;
-	case 'n':
+	case 'T':
 		angle_canhtu[angle_tu_y] += 2.0f;
 		if (angle_canhtu[angle_tu_y] >= 0) angle_canhtu[angle_tu_y] = 0;
+		break;
+
+	//fan
+	case 'q':
+		if (switch_fan) switch_fan = false;
+		else switch_fan = true;
+		break;
+
+	//sofa
+	case 'F':
+		if (ghe_sofaz <= -0.1) {
+			ghe_sofaz += 0.1;
+		}
+		break;
+	case 'R':
+		if (ghe_sofaz >= -1.2) {
+			ghe_sofaz -= 0.1;
+		}
+		break;
+	case 'P':
+		if (ghe_sofax <= -0.01) {
+			ghe_sofax += 0.1;
+		}
+		break;
+	case 'U':
+		if (ghe_sofax >= -1.6) {
+			ghe_sofax -= 0.1;
+		}
+		break;
+
+	//dieu hoa
+	case '1':
+		if (_switch_con) {
+			_switch_con = false;
+			break;
+		}
+		else {
+			_switch_con = true;
+			break;
+		}
+		break;
+	case 'm':
+		lap_angle += 2;
+		if (lap_angle >= 100.0) lap_angle = 100.0;
+		break;
+	case 'M':
+		lap_angle -= 2;
+		if (lap_angle <= 0.0) lap_angle = 0.0;
 		break;
 	}
 }
@@ -1472,10 +1896,18 @@ void danhsachlenh() {
 	cout << "v : ngay, dem " << endl;
 	cout << "r : di chuyen ghe lam viec sang phai " << endl;
 	cout << "f : di chuyen ghe lam viec sang trai " << endl;
-	cout << "u : di chuyen ghe lam viec tien len" << endl;
-	cout << "p : di chuyen ghe lam viec lui xuong" << endl;
-	cout << "m : mo canh tu" << endl;
-	cout << "n : dong canh tu" << endl;
+	cout << "u : di chuyen ghe lam viec tien len (tien lai gan cua chinh)" << endl;
+	cout << "p : di chuyen ghe lam viec lui xuong (lui ra xa cua chinh)" << endl;
+	cout << "t : mo tu tai lieu" << endl;
+	cout << "T : dong tu tai lieu" << endl;
+	cout << "q : bat/tat quat tran" << endl;
+	cout << "m : mo laptop" << endl;
+	cout << "M : dong laptop" << endl;
+	cout << "1 : bat dieu hoa" << endl;
+	cout << "R : di chuyen ghe sofa sang phai " << endl;
+	cout << "F : di chuyen ghe sofa sang trai " << endl;
+	cout << "U : di chuyen ghe sofa tien len (tien lai gan cua chinh)" << endl;
+	cout << "P : di chuyen ghe sofa lui xuong (lui ra xa cua chinh)" << endl;
 	cout << endl;
 }
 // ------------------------------------------
@@ -1489,7 +1921,7 @@ int main(int argc, char* argv[])
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 	glutInitWindowSize(CurrentWidth, CurrentHeight);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutCreateWindow("phong lam viec");
+	glutCreateWindow("MO HINH PHONG LAM VIEC -- GROUP 13");
 
 	glewExperimental = GL_TRUE;
 	glewInit();
